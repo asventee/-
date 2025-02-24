@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>С Днем Рождения, сестра!</title>
+  <style>
+    /* Основные стили */
+    body, html {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      overflow: hidden;
+      background: #000;
+    }
+    /* Оживлённый фон: анимированный градиент (до перехода) */
+    #backgroundEffect {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+      background-size: 400% 400%;
+      animation: gradientAnimation 15s ease infinite;
+      transition: opacity 1s;
+    }
+    @keyframes gradientAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    /* Контейнер для бликов (на черном фоне) */
+    #glowContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .glow {
+      position: absolute;
+      background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, transparent 70%);
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: glowAnimation 5s infinite;
+    }
+    @keyframes glowAnimation {
+      0% { opacity: 0.2; transform: scale(0.8) translate(0, 0); }
+      50% { opacity: 0.8; transform: scale(1.2) translate(20px, 20px); }
+      100% { opacity: 0.2; transform: scale(0.8) translate(0, 0); }
+    }
+    .container {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      color: #fff;
+      padding: 20px;
+    }
+    /* Обёртка для основного контента */
+    .content {
+      transition: opacity 1s;
+    }
+    h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+      animation: slideIn 1.5s ease;
+    }
+    .countdown {
+      font-size: 2em;
+      margin-bottom: 40px;
+      animation: fadeIn 3s ease;
+    }
+    .greeting {
+      font-size: 1.5em;
+      max-width: 600px;
+      line-height: 1.4;
+      animation: fadeIn 4s ease;
+    }
+    .music-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+      background-color: #ff69b4;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      transition: background-color 0.3s;
+    }
+    .music-button:hover {
+      background-color: #ff1493;
+    }
+    /* Контейнер для первоначальных фотографий */
+    #photoContainer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 3;
+      pointer-events: none;
+    }
+    /* Стили для увеличенных фото (первоначальные) */
+    .photo-frame {
+      position: absolute;
+      width: 300px;
+      padding: 5px;
+      border: 2px dashed pink;
+      border-radius: 15px;
+      opacity: 0;
+      animation: photoAppear 5s forwards;
+    }
+    .photo-frame::before {
+      content: "❤️";
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      font-size: 1.2em;
+    }
+    .photo-frame::after {
+      content: "🎈";
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 1.2em;
+    }
+    .photo-image {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 10px;
+    }
+    @keyframes photoAppear {
+      0% { opacity: 0; transform: scale(0.5); }
+      20% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.5); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    /* Стили для мелких фото с поздравлениями на черном экране (больше и медленнее) */
+    .greeting-photo {
+      position: absolute;
+      width: 400px;
+      opacity: 0;
+      animation: dropIn 10s forwards;
+      text-align: center;
+      color: #fff;
+      font-size: 24px;
+    }
+    @keyframes dropIn {
+      0% { opacity: 0; transform: translateY(-100px); }
+      50% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(100px); }
+    }
+    /* Стили для финального сообщения */
+    #finalMessage {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      color: #ffdd00;
+      font-size: 64px;
+      font-weight: bold;
+      text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+      z-index: 4;
+      opacity: 0;
+      animation: finalMessageAnimation 3s forwards;
+    }
+    @keyframes finalMessageAnimation {
+      0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+      50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    /* Стили для ссылки, по клику на которую показывается GIF на весь экран */
+    #gifLink {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      font-size: 24px;
+      color: #ffdd00;
+      text-decoration: underline;
+      cursor: pointer;
+      display: none;
+    }
+    /* Оверлей для GIF */
+    #gifOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 9999;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    #gifOverlay img {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    #gifOverlay .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 32px;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Адаптив для мобильных устройств */
+    @media (max-width: 600px) {
+      h1 { font-size: 2em; }
+      .countdown { font-size: 1.5em; }
+      .greeting { font-size: 1.2em; padding: 0 10px; }
+      .music-button { font-size: 1em; padding: 8px 16px; }
+      .photo-frame { width: 250px; }
+      .greeting-photo { width: 150px; font-size: 16px; }
+      #finalMessage { font-size: 32px; }
+      #gifLink { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Оживлённый фон до перехода -->
+  <div id="backgroundEffect"></div>
+  <!-- Контейнер для бликов на черном экране -->
+  <div id="glowContainer"></div>
+  
+  <!-- Основное содержимое -->
+  <div class="container">
+    <div class="content" id="mainContent">
+      <h1>С Днем Рождения, дорогая Анита!</h1>
+      <div class="countdown" id="countdown"></div>
+      <div class="greeting" id="greeting">Желаю тебе море улыбок, счастья и любви!</div>
+    </div>
+    <button class="music-button" id="musicToggle">Включить музыку</button>
+  </div>
+  
+  <!-- Контейнер для первоначальных фото -->
+  <div id="photoContainer"></div>
+  
+  <!-- Ссылка для показа GIF -->
+  <div id="gifLink">Посмотреть мою GIFку)))</div>
+  
+  <!-- Оверлей для GIF -->
+  <div id="gifOverlay">
+    <div class="close-btn" id="closeGif">✖</div>
+    <!-- Замените 'mygif.gif' на путь к вашей GIF-анимации -->
+    <img src="123.gif" alt="Моя GIFка">
+  </div>
+  
+  <!-- Аудио для фоновой музыки -->
+  <audio id="backgroundMusic" src="music.mp3" loop></audio>
+  
+  <!-- Подключаем библиотеку для салюта -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  
+  <script>
+    // Функция для определения ближайшего дня рождения (25 февраля)
+    function getNextBirthday() {
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      let birthday = new Date(currentYear, 1, 25);
+      if (now > birthday) {
+        birthday = new Date(currentYear + 1, 1, 25);
+      }
+      return birthday;
+    }
+    
+    // Обратный отсчёт
+    const countdownElement = document.getElementById("countdown");
+    const birthday = getNextBirthday().getTime();
+    const timer = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = birthday - now;
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      countdownElement.innerHTML = `${days}д ${hours}ч ${minutes}м ${seconds}с`;
+      if (distance < 0) {
+        clearInterval(timer);
+        countdownElement.innerHTML = "С Днем Рождения!";
+      }
+    }, 1000);
+    
+    // Функции изменения громкости
+    function fadeIn(audio, duration = 2000) {
+      audio.volume = 0;
+      const step = 0.1;
+      const interval = duration * step;
+      const fadeInInterval = setInterval(() => {
+        if (audio.volume < 1) {
+          audio.volume = Math.min(audio.volume + step, 1);
+        } else {
+          clearInterval(fadeInInterval);
+        }
+      }, interval);
+    }
+    function fadeOut(audio, duration = 2000, callback) {
+      const step = 0.1;
+      const interval = duration * step;
+      const fadeOutInterval = setInterval(() => {
+        if (audio.volume > 0) {
+          audio.volume = Math.max(audio.volume - step, 0);
+        } else {
+          clearInterval(fadeOutInterval);
+          if (callback) callback();
+        }
+      }, interval);
+    }
+    
+    const backgroundMusic = document.getElementById("backgroundMusic");
+    const musicToggle = document.getElementById("musicToggle");
+    const photoContainer = document.getElementById("photoContainer");
+    const greetingElement = document.getElementById("greeting");
+    const mainContent = document.getElementById("mainContent");
+    const backgroundEffect = document.getElementById("backgroundEffect");
+    const glowContainer = document.getElementById("glowContainer");
+    const gifLink = document.getElementById("gifLink");
+    const gifOverlay = document.getElementById("gifOverlay");
+    const closeGif = document.getElementById("closeGif");
+    
+    // Массив с 17 фотографиями (замените на свои пути)
+    const photos = [
+      'photo1.jpg', 'photo2.jpg', 'photo3.jpeg', 'photo4.jpeg', 'photo5.jpeg',
+      'photo6.jpeg', 'photo7.jpeg', 'photo8.jpeg', 'photo9.jpeg', 'photo10.jpeg',
+      'photo11.jpeg', 'photo12.jpeg', 'photo13.jpeg', 'photo14.jpg', 'photo15.jpg',
+      'photo16.jpg', 'photo17.jpg'
+    ];
+    // Массив поздравительных сообщений
+    const messages = [
+      "Желаю тебе море улыбок, счастья и любви!",
+      "Пусть каждый день будет наполнен радостью и волшебством!",
+      "Пусть исполнятся все твои мечты!",
+      "Счастье пусть всегда будет рядом!",
+      "Ты – источник вдохновения для всех нас!",
+      "Пусть твоя жизнь будет яркой и незабываемой!"
+    ];
+    
+    // Ротация поздравительных сообщений
+    let messageIndex = 0;
+    setInterval(() => {
+      greetingElement.innerHTML = messages[messageIndex % messages.length];
+      messageIndex++;
+    }, 5000);
+    
+    // Функция создания и анимации первоначальных фото (увеличенные)
+    function spawnPhoto(src) {
+      const frame = document.createElement('div');
+      frame.className = 'photo-frame';
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = 'photo-image';
+      frame.appendChild(img);
+      frame.style.top = Math.random() * 80 + '%';
+      frame.style.left = Math.random() * 80 + '%';
+      photoContainer.appendChild(frame);
+      setTimeout(() => {
+        if(frame.parentNode) {
+          photoContainer.removeChild(frame);
+        }
+      }, 5000);
+    }
+    
+    // Флаг, чтобы переход выполнялся один раз
+    let transitionDone = false;
+    
+    // Последовательное появление первоначальных фото
+    function triggerPhotos() {
+      let index = 0;
+      const interval = setInterval(() => {
+        spawnPhoto(photos[index % photos.length]);
+        index++;
+        if (index >= 20) {
+          clearInterval(interval);
+          if (!transitionDone) {
+            transitionDone = true;
+            setTimeout(transitionToBlackScreen, 1000);
+          }
+        }
+      }, 500);
+    }
+    
+    // Переход на чёрный экран: скрываем контент и фон, затем запускаем мелкие фото и блики
+    function transitionToBlackScreen() {
+      mainContent.style.opacity = 0;
+      backgroundEffect.style.opacity = 0;
+      document.body.style.background = "#000";
+      triggerGreetingPhotos();
+      triggerGlows();
+    }
+    
+    // Создание мелких фото с поздравлениями (на черном экране)
+    function spawnGreetingPhoto() {
+      const div = document.createElement('div');
+      div.className = 'greeting-photo';
+      const img = document.createElement('img');
+      img.src = photos[Math.floor(Math.random() * photos.length)];
+      img.style.width = "100%";
+      img.style.borderRadius = "5px";
+      const caption = document.createElement('div');
+      caption.textContent = messages[Math.floor(Math.random() * messages.length)];
+      caption.style.color = "#fff";
+      caption.style.fontSize = "24px";
+      caption.style.textAlign = "center";
+      div.appendChild(img);
+      div.appendChild(caption);
+      div.style.left = Math.random() * 90 + '%';
+      div.style.top = Math.random() * 90 + '%';
+      document.body.appendChild(div);
+      setTimeout(() => { div.remove(); }, 10000);
+    }
+    
+    // Последовательное появление мелких фото с поздравлениями
+    function triggerGreetingPhotos() {
+      let count = 0;
+      const greetingInterval = setInterval(() => {
+        spawnGreetingPhoto();
+        count++;
+        if (count >= 30) {
+          clearInterval(greetingInterval);
+          // После появления всех мелких фото, через 2 секунды показываем финальное сообщение
+          setTimeout(displayFinalMessage, 2000);
+        }
+      }, 300);
+    }
+    
+    // Создание красивых бликов на черном фоне
+    function triggerGlows() {
+      for (let i = 0; i < 5; i++) {
+        const glow = document.createElement('div');
+        glow.className = 'glow';
+        glow.style.left = Math.random() * 90 + '%';
+        glow.style.top = Math.random() * 90 + '%';
+        glow.style.animationDelay = Math.random() * 3 + 's';
+        glowContainer.appendChild(glow);
+        setTimeout(() => { glow.remove(); }, 10000);
+      }
+    }
+    
+    // Запуск эффекта салюта
+    function triggerFireworks() {
+      const duration = 5000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 1000 };
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        const particleCount = 50 * (timeLeft / duration);
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } }));
+      }, 250);
+    }
+    
+    // Отображение финального сообщения и показ ссылки на GIF
+    function displayFinalMessage() {
+      triggerFireworks();
+      const finalMessage = document.createElement('div');
+      finalMessage.id = 'finalMessage';
+      finalMessage.textContent = "С Днем Рождения, Анита!";
+      document.body.appendChild(finalMessage);
+      // Через 3 секунды показываем ссылку на GIF
+      setTimeout(() => {
+        gifLink.style.display = 'block';
+      }, 3000);
+    }
+    
+    // Обработчик клика по ссылке для показа GIF
+    gifLink.addEventListener("click", () => {
+      gifOverlay.style.display = 'flex';
+    });
+    // Обработчик закрытия GIF-оверлея
+    closeGif.addEventListener("click", () => {
+      gifOverlay.style.display = 'none';
+    });
+    
+    // Обработчик кнопки музыки
+    musicToggle.addEventListener("click", () => {
+      if (backgroundMusic.paused) {
+        backgroundMusic.play().then(() => {
+          fadeIn(backgroundMusic);
+        }).catch((error) => {
+          console.log("Ошибка воспроизведения музыки:", error);
+        });
+        musicToggle.textContent = "Выключить музыку";
+        triggerFireworks();
+        if (!transitionDone) {
+          triggerPhotos();
+        }
+      } else {
+        fadeOut(backgroundMusic, 2000, () => {
+          backgroundMusic.pause();
+        });
+        musicToggle.textContent = "Включить музыку";
+        photoContainer.innerHTML = "";
+      }
+    });
+  </script>
+</body>
+</html>
